@@ -4,6 +4,6 @@ volumes/
 venv/
 api/__pycache__
 api/router/__pycache__
-api/scraper/__pycache__
+api/scrapers/__pycache__
 api/database/__pycache__
 .vscode/
