@@ -1,0 +1,27 @@
+version: '3'
+services:
+  item_db:
+    container_name: maria-db
+    image: mariadb:latest
+    volumes:
+      - ./volumes/items:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - 3306:3306
+
+  api:
+    container_name: flask-api
+    build: ./api
+    depends_on:
+      - item_db
+    environment:
+      - DATABASE_URL=mysql+pymysql://root:${DB_PASSWORD}@localhost/${DB_NAME}
+    command: ["python", "./app.py"]
+    restart: always
+    ports:
+      - 8000:8000
+    volumes:
+      - ./api:/app

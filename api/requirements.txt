@@ -1,0 +1,7 @@
+fastapi
+databases
+aiomysql
+sqlalchemy
+uvicorn
+bs4
+selenium
