@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database.product import Base
+from database.product import productBase
+from database.users import usersBase
 import os
 
 class DBHandler:
@@ -14,4 +15,5 @@ class DBHandler:
         self.session = Session()
 
     def create_tables(self):
-        Base.metadata.create_all(self.engine)
+        productBase.metadata.create_all(self.engine)
+        usersBase.metadata.create_all(self.engine)

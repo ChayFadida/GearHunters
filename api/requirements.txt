@@ -5,3 +5,5 @@ sqlalchemy
 uvicorn
 bs4
 selenium
+mysql-connector-python
+pyjwt

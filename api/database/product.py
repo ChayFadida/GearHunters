@@ -1,9 +1,9 @@
 from sqlalchemy import Column, BigInteger, String, Float, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
 
-Base = declarative_base()
+productBase = declarative_base()
 
-class Product(Base):
+class Product(productBase):
     __tablename__ = 'product'
 
     id = Column(BigInteger, primary_key=True)
