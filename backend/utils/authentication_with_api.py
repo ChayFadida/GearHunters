@@ -1,19 +1,14 @@
-from flask import Blueprint, request, jsonify
+from flask import request, jsonify
+from config.app_contex import API_AUTHENTICATION_URL, api_user, api_password
 import requests
 import os
-
-# Create a Flask Blueprint for authentication routes
-auth_bp = Blueprint('auth', __name__)
-
-# Define the base URL of the FastAPI API
-API_BASE_URL = f"{os.getenv('API_BASE_URL')}/authentication"
 
 # Initialize the access token as None initially
 access_token = None
 
 # Function to check if a given token is valid by making an API request
 def is_token_valid(token):
-    response = requests.get(f"{API_BASE_URL}/verify_token", headers={"Authorization": f"Bearer {token}"})
+    response = requests.get(f"{API_AUTHENTICATION_URL}/verify_token", headers={"Authorization": f"Bearer {token}"})
     return response.status_code == 200
 
 # Function to retrieve an access token from the API
@@ -24,7 +19,7 @@ def get_token(username, password):
         "password": password
     }
     try:
-        response = requests.post(f"{API_BASE_URL}/login", data=data)
+        response = requests.post(f"{API_AUTHENTICATION_URL}/login", data=data)
     except Exception as e:
         print("API is not active")
         
@@ -42,19 +37,16 @@ def get_valid_access_token(username, password):
         access_token = get_token(username, password)
 
     # Check if the current access token is valid
-    response = requests.get(f"{API_BASE_URL}/verify_token", headers={"Authorization": f"Bearer {access_token}"})
+    response = requests.get(f"{API_AUTHENTICATION_URL}/verify_token", headers={"Authorization": f"Bearer {access_token}"})
     if response.status_code == 200:
         return access_token
     else:
         # If the token is expired or invalid, get a new one
         get_token(username, password)
 
-# Define a route for user authentication to the API
-@auth_bp.route("/login_to_api", methods=["POST"])
 def login_to_api():
-    data = request.form
-    username = data.get('username')
-    password = data.get('password')
+    username = api_user
+    password = api_password
 
     if username is None or password is None:
         # Return an error response if username or password is missing

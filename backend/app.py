@@ -1,5 +1,5 @@
 from flask import Flask, render_template
-from routes.authentication_routes import auth_bp
+from routes.products import products_bp
 from dotenv import load_dotenv
 import os
 
@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config['STATIC_FOLDER'] = 'static'
 
 # Register the authentication Blueprint
-app.register_blueprint(auth_bp)
+app.register_blueprint(products_bp)
 
 
 @app.route('/')
