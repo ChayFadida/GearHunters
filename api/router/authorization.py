@@ -116,3 +116,9 @@ async def approve_user(username: str, current_user: dict = Depends(is_admin), db
     else:
         raise HTTPException(status_code=400, detail="User is not in a pending state")
 
+# Define a route to check token validity and expiration
+@router.get("/verify_token", summary="Check Token Validity", tags=["User"], response_model=dict)
+async def check_token(current_user: dict = Depends(verify_token)):
+    if current_user is None:
+        return {"message": "Token is expired", "status_code": 403}
+    return {"message": "Token is valid and ready to use"}
