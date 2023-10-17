@@ -4,6 +4,7 @@ from database.product import Product
 from database.dbHandler import DBHandler
 from typing import Optional
 from sqlalchemy import or_
+from router.authorization import is_admin
 
 router = APIRouter(prefix="/products")
 
@@ -37,7 +38,8 @@ def get_products(
     current_price: Optional[float] = Query(None, description="Filter by current price"),
     gender: Optional[str] = Query(None, description="Filter by gender"),
     sizes: Optional[str] = Query(None, description="Filter by sizes (comma-separated)"),
-    session: Session = Depends(get_db)
+    session: Session = Depends(get_db),
+    current_user: dict = Depends(is_admin)
 ):
     query = session.query(Product)
 
@@ -58,6 +60,4 @@ def get_products(
             query = filters[param_name](query, param_value)
 
     products = query.all()
-
-    
     return products
