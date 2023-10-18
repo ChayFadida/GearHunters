@@ -8,3 +8,4 @@ selenium
 mysql-connector-python
 pyjwt
 dotenv
+bcrypt

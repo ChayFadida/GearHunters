@@ -8,6 +8,7 @@ from pydantic import BaseModel
 import jwt
 import datetime
 import os
+import bcrypt
 
 preflix = "/authentication"
 
@@ -79,9 +80,13 @@ async def register_user(username: str, password: str, role: str, db: Session = D
     if role not in valid_roles:
         raise HTTPException(status_code=400, detail="Invalid role. Choose from user, admin, or developer.")
 
-    # Store user data
-    user = user_handler.create_user(username, password, role=role, status="pending")
+    # Hash the user's password
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+    # Store user data with the hashed password
+    user = user_handler.create_user(username, hashed_password, role=role, status="pending")
     return {"message": "User registered successfully"}
+
 
 # Define a route for user login
 @router.post("/login", response_model=dict)
@@ -92,7 +97,8 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessi
     if not user:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    if user.password != form_data.password:
+    # Verify the hashed password
+    if not bcrypt.checkpw(form_data.password.encode('utf-8'), user.password.encode('utf-8')):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     if user.status == "approved":
@@ -100,6 +106,7 @@ async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: Sessi
         return {"access_token": access_token, "token_type": "bearer"}
     else:
         raise HTTPException(status_code=401, detail="Account not approved")
+
 
 # Define a route for an administrator to approve a user
 @router.post("/approve_user/{username}", tags=["admin"], response_model=dict)
