@@ -2,8 +2,6 @@ webScrapeLog.log
 .env
 volumes/
 venv/
-api/__pycache__
-api/router/__pycache__
-api/scrapers/__pycache__
-api/database/__pycache__
 .vscode/
+**__pycache__**
+react-frontend/node_modules

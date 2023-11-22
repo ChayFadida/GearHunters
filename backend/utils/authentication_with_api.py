@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from config.app_contex import API_AUTHENTICATION_URL, api_user, api_password
+from config.app_contex import API_AUTHENTICATION_URL, API_USER, API_PASSWORD
 import requests
 import os
 
@@ -45,8 +45,8 @@ def get_valid_access_token(username, password):
         get_token(username, password)
 
 def login_to_api():
-    username = api_user
-    password = api_password
+    username = API_USER
+    password = API_PASSWORD
 
     if username is None or password is None:
         # Return an error response if username or password is missing

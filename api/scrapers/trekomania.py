@@ -1,5 +1,6 @@
 from selenium import webdriver
 from bs4 import BeautifulSoup
+import requests
 import logging
 import re
 from datetime import datetime
@@ -9,6 +10,8 @@ import concurrent.futures
 import logging.handlers
 import threading
 from database.dbHandler import DBHandler
+from config.app_contex import image_location
+import os
 
 size_order = ["XS", "S", "M", "L", "XL", "XXL"]
 
@@ -167,8 +170,6 @@ class TrekomaniaScrapper:
         products_html_obj = self.get_products_obj_by_page(page)
         for element in products_html_obj:
             dict, id = self.get_product_dict(element)
-            if id in self.product_info_dict.keys():
-                print("hello")
             self.product_info_dict[id] = dict
         # for each elemnt get all his data and create json dict
         log.info(f"Finished scraping for thread {threading.current_thread().ident}")
@@ -256,7 +257,25 @@ class TrekomaniaScrapper:
             return 'F'
         else:
             return 'U'
-    
+
+    def download_image(self, image_url, product_id):
+            try:
+                response = requests.get(image_url, stream=True)
+                response.raise_for_status()
+                
+                # Extract the file extension from the URL
+                file_extension = image_url.split('.')[-1]
+
+                # Save the image to a specific location
+                image_path = image_location
+                
+                with open(image_path, 'wb') as file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        file.write(chunk)
+                
+                log.info(f"Image for product {product_id} downloaded successfully.")
+            except Exception as e:
+                log.error(f"Failed to download image for product {product_id}: {e}")
 
     def run(self) -> None:
         # threads params are a list of all pages in the website

@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, func
 from sqlalchemy.ext.declarative import declarative_base
+from config.logger_config import log
 
 usersBase = declarative_base()
 
@@ -24,6 +25,7 @@ class UserHandler:
         self.session = session
 
     def create_user(self, username, password, role, status):
+        log.info(f'Creating user {username} as {role}')
         user = User(username=username, password=password, role=role, status=status)
         self.session.add(user)
         self.session.commit()
@@ -36,5 +38,6 @@ class UserHandler:
         return self.session.query(User).get(user_id)
 
     def update_user_status(self, user, new_status):
+        log.info(f'Updating user {user} to status {new_status}')
         user.status = new_status
         self.session.commit()

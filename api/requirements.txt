@@ -7,5 +7,5 @@ bs4
 selenium
 mysql-connector-python
 pyjwt
-dotenv
 bcrypt
+python-multipart

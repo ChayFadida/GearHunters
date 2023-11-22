@@ -1,13 +1,10 @@
 from flask import Flask, render_template
 from routes.products import products_bp
-from dotenv import load_dotenv
 import os
 
 # Verify dot env path
 env_file_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 
-# Load environment variables from the .env file
-load_dotenv(dotenv_path=env_file_path)
 app = Flask(__name__)
 
 # Add the following lines to configure the static folder
@@ -30,4 +27,4 @@ def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

@@ -22,6 +22,7 @@ def fetch_product():
             if response.status_code == 200:
                 response_data = response.content.decode('utf-8', errors='ignore')
                 product_data = json.loads(response_data)
+                response = jsonify(product_data)
                 return jsonify(product_data)
             else:
                 error_data = response.json()
@@ -29,4 +30,4 @@ def fetch_product():
         else:
             return jsonify({"error": "Unable to obtain a valid token."}), 401
     else:
-        return login_response[0]  # Return the login response as is
+        return login_response[0]
