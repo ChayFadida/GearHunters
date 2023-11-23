@@ -115,7 +115,15 @@ class TrekomaniaScrapper:
             dict[attr] = (span[f'{self.common_attributes_data_string}_{attr}'])
         dict['actual_price'] = self.get_actual_price(element)
         dict['sizes'] = self.get_sizes_of_product(element, dict['url'], id)
+        dict['image_url'] = self.get_image_url(element)
         return dict, id
+
+    def get_image_url(self, element):
+        img_tag = element.find('img')
+        if img_tag is not None and 'src' in img_tag.attrs:
+            return img_tag['data-src']
+        else:
+            return None
 
     def get_actual_price(self, element) -> str:
         price_del = element.find('del')
@@ -170,6 +178,8 @@ class TrekomaniaScrapper:
         products_html_obj = self.get_products_obj_by_page(page)
         for element in products_html_obj:
             dict, id = self.get_product_dict(element)
+            image_location = self.download_image(dict['image_url'], id)
+            dict['image_location'] = image_location
             self.product_info_dict[id] = dict
         # for each elemnt get all his data and create json dict
         log.info(f"Finished scraping for thread {threading.current_thread().ident}")
@@ -204,7 +214,8 @@ class TrekomaniaScrapper:
                         original_price=product_info['actual_price'],
                         current_price=product_info['price'],
                         gender=self.get_product_gender(product_id),
-                        sizes=product_info['sizes']
+                        sizes=product_info['sizes'],
+                        image_location=product_info['image_location']
                     )
                     new_product_list.append(product)
                 else:
@@ -216,6 +227,7 @@ class TrekomaniaScrapper:
                     product.current_price = product_info['price']
                     product.gender = self.get_product_gender(product_id)
                     product.sizes = product_info['sizes']
+                    product.image_location = product_info['image_location']
                     product.last_update =  datetime.now()
                     existing_product_list.append({
                         'id': product_id,
@@ -259,23 +271,50 @@ class TrekomaniaScrapper:
             return 'U'
 
     def download_image(self, image_url, product_id):
-            try:
-                response = requests.get(image_url, stream=True)
-                response.raise_for_status()
-                
-                # Extract the file extension from the URL
-                file_extension = image_url.split('.')[-1]
+        try:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
 
-                # Save the image to a specific location
-                image_path = image_location
-                
-                with open(image_path, 'wb') as file:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        file.write(chunk)
-                
-                log.info(f"Image for product {product_id} downloaded successfully.")
-            except Exception as e:
-                log.error(f"Failed to download image for product {product_id}: {e}")
+            # Extract the file extension from the URL
+            file_extension = image_url.split('.')[-1]
+
+            # Save the image to a specific location with the product_id as the file name
+            image_filename = f"{product_id}.{file_extension}"
+            image_path = os.path.join(image_location, image_filename)
+
+            with open(image_path, 'wb') as file:
+                for chunk in response.iter_content(chunk_size=8192):
+                    file.write(chunk)
+
+            log.info(f"Image for product {product_id} downloaded successfully.")
+            return image_path
+        except Exception as e:
+            log.error(f"Failed to download image for product {product_id}: {e}")
+
+    def check_and_delete_unused_images(self, valid_ids):
+
+        # Get a list of all image files in the specified location
+        all_images = [f for f in os.listdir(image_location) if os.path.isfile(os.path.join(image_location, f)) and not f.startswith('.')]
+
+        # Extract product IDs from image file names
+        existing_ids = [os.path.splitext(image)[0] for image in all_images]
+
+        # Find IDs that are present in the image location but not in the valid_ids array
+        unused_ids = set(existing_ids) - set(valid_ids)
+
+        # Delete images corresponding to unused IDs
+        for unused_id in unused_ids:
+            # Find the image file with any extension for the unused ID
+            matching_files = [image for image in all_images if image.startswith(f"{unused_id}.")]
+
+            for matching_file in matching_files:
+                image_path = os.path.join(image_location, matching_file)
+                try:
+                    os.remove(image_path)
+                    log.info(f"Deleted unused image: {image_path}")
+                except FileNotFoundError:
+                    log.warning(f"Image not found for ID: {unused_id}")
+
 
     def run(self) -> None:
         # threads params are a list of all pages in the website
@@ -284,6 +323,7 @@ class TrekomaniaScrapper:
             futures = [executor.submit(self.run_for_page, param) for param in threads_params]
         concurrent.futures.wait(futures)
         log.info("all threads finished")
+        self.check_and_delete_unused_images(set(self.product_info_dict.keys()))
         self.insert_data_to_db()
         log.info("Web Bot Finished Successfully")
         print("Finish")

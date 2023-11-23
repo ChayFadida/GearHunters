@@ -5,6 +5,10 @@ from database.dbHandler import DBHandler
 from typing import Optional
 from sqlalchemy import or_
 from router.authorization import is_admin
+from fastapi.responses import FileResponse
+from starlette import status
+from fastapi import HTTPException
+import os
 
 router = APIRouter(prefix="/products")
 
