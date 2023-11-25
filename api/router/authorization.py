@@ -13,6 +13,7 @@ import os
 import bcrypt
 
 preflix = "/authentication"
+hours_expired = 1
 
 # Define a FastAPI router
 router = APIRouter(prefix=preflix)
@@ -59,7 +60,8 @@ def is_admin(current_user: dict = Depends(verify_token)):
 # Function to generate access tokens
 def create_access_token(data: dict):
     log.debug("Creating access token")
-    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=hours_expired)
+
     payload = {"data": data, "exp": expiration}
     token = jwt.encode(payload, JWT_SECRET_KEY, algorithm=TOKEN_ALGORITHM)
     return token

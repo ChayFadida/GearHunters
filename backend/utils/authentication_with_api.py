@@ -37,12 +37,14 @@ def get_valid_access_token(username, password):
         access_token = get_token(username, password)
 
     # Check if the current access token is valid
-    response = requests.get(f"{API_AUTHENTICATION_URL}/verify_token", headers={"Authorization": f"Bearer {access_token}"})
-    if response.status_code == 200:
+    if is_token_valid(access_token):
         return access_token
     else:
         # If the token is expired or invalid, get a new one
-        get_token(username, password)
+        refresh_token = get_token(username, password)
+        if is_token_valid(refresh_token):
+            return refresh_token
+    return None
 
 def login_to_api():
     username = API_USER
