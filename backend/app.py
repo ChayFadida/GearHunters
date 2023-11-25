@@ -1,11 +1,13 @@
 from flask import Flask, render_template
 from routes.products import products_bp
+from flask_cors import CORS
 import os
 
 # Verify dot env path
 env_file_path = os.path.join(os.path.dirname(__file__), '..', '.env')
 
 app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Add the following lines to configure the static folder
 app.config['STATIC_FOLDER'] = 'static'

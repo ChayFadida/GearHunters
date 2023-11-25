@@ -8,6 +8,9 @@ from router.authorization import is_admin
 from fastapi.responses import FileResponse
 from starlette import status
 from fastapi import HTTPException
+from fastapi.responses import FileResponse
+from config.app_contex import image_location
+
 import os
 
 router = APIRouter(prefix="/products")
@@ -65,3 +68,16 @@ def get_products(
 
     products = query.all()
     return products
+
+@router.get('/{product_id}/image')
+def get_product_image(product_id: int, session: Session = Depends(get_db)):
+    product = session.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    extention = product.image_location.split(".")[-1]
+    image_path = f"{image_location}/{product_id}.{extention}"
+    if not os.path.exists(image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    return FileResponse(image_path, media_type="image/jpeg")  # Adjust media_type accordingly

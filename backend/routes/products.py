@@ -22,6 +22,7 @@ def fetch_product():
             if response.status_code == 200:
                 response_data = response.content.decode('utf-8', errors='ignore')
                 product_data = json.loads(response_data)
+
                 response = jsonify(product_data)
                 return jsonify(product_data)
             else:
@@ -31,3 +32,7 @@ def fetch_product():
             return jsonify({"error": "Unable to obtain a valid token."}), 401
     else:
         return login_response[0]
+
+@products_bp.route("/fetch_product_image/<int:product_id>")
+def fetch_product_image(product_id):
+    return f"API_PRODUCTS_URL/{product_id}/image"

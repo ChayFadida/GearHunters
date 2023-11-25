@@ -13,3 +13,6 @@ RUN pip install --upgrade pip
 # Install any needed packages specified in requirements.txt
 RUN pip install -r requirements.txt
 
+RUN apt-get update
+
+RUN apt-get install -y chromium-driver

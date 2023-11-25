@@ -20,6 +20,7 @@ services:
     environment:
       - DATABASE_URL=mysql+pymysql://root:${DB_PASSWORD}@api_db/${DB_NAME}
       - JWT_SECRET_KEY="secret"
+      - DISPLAY=99
     command: ["python", "./app.py"]
     restart: always
     ports:

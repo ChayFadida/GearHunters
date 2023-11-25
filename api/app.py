@@ -2,14 +2,11 @@ from fastapi import FastAPI
 import uvicorn
 from router import products, scraper, authorization
 from database.dbHandler import DBHandler
-from config.app_contex import api_title, api_description, api_version, api_docs_url
+from config.app_contex import api_title, api_description, api_version, api_docs_url, image_location
 import os
 
 # Verify dot env path
 env_file_path = os.path.join(os.path.dirname(__file__), '..', '.env')
-
-# Load environment variables from the .env file
-# load_dotenv(dotenv_path=env_file_path)
 
 # Create an instance of the FastAPI class
 app = FastAPI(
@@ -24,6 +21,8 @@ dbHandler = DBHandler()
 
 #Create tables
 dbHandler.create_tables()
+
+os.makedirs(image_location, exist_ok=True)
 
 # Including all routes
 app.include_router(products.router)
