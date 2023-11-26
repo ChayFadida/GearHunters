@@ -53,18 +53,12 @@ export const ShopContextProvider = (props) => {
   };
 
   const deselectProduct = (itemId) => {
-    setCartItems((prev) => {
-      const updatedCart = {
-        ...prev,
-        [itemId]: {
-          selected: false,
-        },
-      };
-
-      console.log(`Product with ID ${itemId} deselected. Updated Cart:`, updatedCart);
-
-      return updatedCart;
-    });
+    setCartItems((prev) => ({
+      ...prev,
+      [itemId]: {
+        selected: false,
+      },
+    }));
   };
 
   const contextValue = {

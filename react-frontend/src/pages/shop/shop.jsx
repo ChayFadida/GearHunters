@@ -1,22 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { useAppContext } from '../../AppContext';
 import { Product } from './product';
 import { fetchProducts } from '../../productService'; // Adjust the path accordingly
 import './shop.css';
+import ProductContext from '../../context/ProductContext';
 
 export const Shop = () => {
-    const [products, setProducts] = useState([]);
-    const { routes } = useAppContext();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const productsData = await fetchProducts(routes.backendRoute, routes.apiRoute);
-            setProducts(productsData);
-        };
-
-        fetchData();
-    }, [routes.backendRoute, routes.apiRoute]);
-
+    const products = useContext(ProductContext);
     return (
         <div className='shop'>
             <div className='shopTitle'>

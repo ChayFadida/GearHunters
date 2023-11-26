@@ -3,7 +3,8 @@ import { ShopContext} from "../../context/shop-context"
 
 export const Product = (props) => {
     const { id, productName, price, productImage } = props.data;
-    const { selectProduct } = useContext(ShopContext)
+    const { selectProduct, cartItems } = useContext(ShopContext)
+    const cartSelected = cartItems[id] ? cartItems[id].selected : false;
     return (
         <div className='product'>
 
@@ -15,7 +16,9 @@ export const Product = (props) => {
                 <p> ₪{price}</p>
             </div>
             <div>
-                <button className="addToCartBttn" onClick={() => selectProduct(id)}> צפה במוצר</button>
+                <button className="addToCartBttn" onClick={() => selectProduct(id)}> 
+                {cartSelected ? '!נבחר' : 'בחר במוצר'}
+                </button>
             </div>
         </div>
     )
