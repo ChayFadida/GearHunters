@@ -1,5 +1,6 @@
 version: '3'
 services:
+
   api_db:
     container_name: gearhunters-item-maria-db
     image: mariadb:latest
@@ -27,7 +28,7 @@ services:
       - 8000:8000
     volumes:
       - ./api:/app
-  
+      - ./volumes:/Images
   backend:
     container_name: gearhunters-backend
     build: ./backend
@@ -43,3 +44,20 @@ services:
       - API_BASE_URL=http://api:8000
       - API_USER=${API_USER}
       - API_PASSWORD=${API_PASSWORD}
+  
+  # frontend:
+  #   container_name: gearhunters-frontend
+  #   build: 
+  #     context: ./react-frontend
+  #     args:
+  #       API_BASE_URL: "http://0.0.0.0:8000"
+  #       BACKEND_BASE_URL: "http://0.0.0.0:8001"
+  #   depends_on:
+  #     - api
+  #   command: ["npx", "serve", "-s", "build"]
+  #   restart: always
+  #   ports:
+  #     - 8002:3000
+  #   environment:
+  #     - API_BASE_URL="http://api:8000"
+  #     - BACKEND_BASE_URL="http://backend:5000"
